@@ -58,6 +58,10 @@ RUN openssl genrsa 2048 > server.key \
  && cp server.key /etc/apache2/ssl/server.key \
  && chmod 400 /etc/apache2/ssl/server.key
 
+# Apache FQDN
+RUN echo "ServerName localhost" > /etc/apache2/conf-available/fqdn.conf \
+ && a2enconf fqdn
+
 # Apache
 COPY myapp.conf /etc/apache2/sites-available/myapp.conf
 RUN mkdir -p /var/www/html/public \
