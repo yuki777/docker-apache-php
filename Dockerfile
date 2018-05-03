@@ -64,6 +64,7 @@ RUN mkdir -p /var/www/html/public \
  && a2enmod ssl \
  && a2enmod rewrite \
  && a2enmod expires \
+ && a2enmod headers \
  && a2dissite 000-default.conf \
  && a2ensite myapp.conf \
  && service apache2 restart
