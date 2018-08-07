@@ -72,3 +72,6 @@ RUN mkdir -p /var/www/html/public \
  && a2dissite 000-default.conf \
  && a2ensite myapp.conf \
  && service apache2 restart
+
+# Cron, Vim
+RUN apt-get update && apt-get install -y cron vim
