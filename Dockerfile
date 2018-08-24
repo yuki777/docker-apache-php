@@ -49,14 +49,10 @@ RUN apt-get update && apt-get install -y git
 # Zip
 RUN apt-get update && apt-get install -y zip unzip
 
-# Apache SSL
-RUN openssl genrsa 2048 > server.key \
- && openssl req -new -key server.key -subj "/C=JP/CN=localhost" > server.csr \
- && openssl x509 -in server.csr -days 3650 -req -signkey server.key > server.crt \
- && mkdir -p /etc/apache2/ssl \
- && cp server.crt /etc/apache2/ssl/server.crt \
- && cp server.key /etc/apache2/ssl/server.key \
- && chmod 400 /etc/apache2/ssl/server.key
+# Mkcert SSL
+COPY localhost.pem /etc/apache2/ssl/localhost.pem
+COPY localhost-key.pem /etc/apache2/ssl/localhost-key.pem
+RUN chmod 400 /etc/apache2/ssl/localhost.pem /etc/apache2/ssl/localhost-key.pem
 
 # Apache FQDN
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/fqdn.conf \
