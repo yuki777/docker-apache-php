@@ -75,8 +75,3 @@ RUN mkdir -p /var/www/html/public \
 
 # Cron, Vim
 RUN apt-get update && apt-get install -y cron vim
-
-# XDebug
-RUN pecl install -o -f xdebug \
- && rm -rf /tmp/pear \
- && docker-php-ext-enable xdebug
