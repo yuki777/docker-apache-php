@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y git zip unzip cron vim
 #######################################################
 # .bashrc
 #######################################################
-# .bashrc updating
 USER docker
 RUN echo 'eval "$(symfony-autocomplete)"' > ~/.bash_profile
 RUN { \
@@ -39,9 +38,7 @@ USER root
 #######################################################
 # Apache
 #######################################################
-RUN a2enmod rewrite
 RUN chown docker:docker /var/www/html
-# Apache FQDN
 RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
  && a2enconf servername
 CMD ["apache2-foreground"]
@@ -72,10 +69,6 @@ RUN mkdir -p /var/www/html/public \
 #######################################################
 # PHP
 #######################################################
-# Default php.ini file
-ADD https://raw.githubusercontent.com/php/php-src/php-${PHP_VERSION}/php.ini-production  /usr/local/etc/php/php.ini-production
-ADD https://raw.githubusercontent.com/php/php-src/php-${PHP_VERSION}/php.ini-development /usr/local/etc/php/php.ini-development
-RUN chmod 644 /usr/local/etc/php/php.ini-*
 # Main PHP extensions
 RUN apt-get update && apt-get install -y \
     zlib1g-dev \
