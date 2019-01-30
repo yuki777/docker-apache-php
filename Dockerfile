@@ -1,6 +1,82 @@
-FROM php:7.2-apache-stretch
+FROM php:7.3-apache-stretch
 
-# php-ext
+#######################################################
+# UTF8
+#######################################################
+RUN apt-get update && \
+    apt-get install -y locales && \
+    locale-gen C.UTF-8 && \
+    /usr/sbin/update-locale LANG=C.UTF-8 && \
+    apt-get remove -y locales
+ENV LANG C.UTF-8
+
+#######################################################
+# User
+#######################################################
+RUN useradd -ms /bin/bash docker && adduser docker sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+#######################################################
+# Dev tools
+#######################################################
+# Git Zip Cron Vim
+RUN apt-get update && apt-get install -y git zip unzip cron vim
+
+#######################################################
+# .bashrc
+#######################################################
+# .bashrc updating
+USER docker
+RUN echo 'eval "$(symfony-autocomplete)"' > ~/.bash_profile
+RUN { \
+        echo "alias ls='ls --color=auto'"; \
+        echo "alias ll='ls --color=auto -alF'"; \
+        echo "alias la='ls --color=auto -A'"; \
+        echo "alias l='ls --color=auto -CF'"; \
+    } >> ~/.bashrc
+USER root
+
+#######################################################
+# Apache
+#######################################################
+RUN a2enmod rewrite
+RUN chown docker:docker /var/www/html
+# Apache FQDN
+RUN echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf \
+ && a2enconf servername
+CMD ["apache2-foreground"]
+# Apache user
+ENV APACHE_RUN_USER=docker \
+    APACHE_RUN_GROUP=docker
+# Apache SSL
+RUN openssl genrsa 2048 > server.key \
+ && openssl req -new -key server.key -subj "/C=JP/CN=localhost" > server.csr \
+ && openssl x509 -in server.csr -days 3650 -req -signkey server.key > server.crt \
+ && mkdir -p /etc/apache2/ssl \
+ && cp server.crt /etc/apache2/ssl/server.crt \
+ && cp server.key /etc/apache2/ssl/server.key \
+ && chmod 400 /etc/apache2/ssl/server.key
+# Overwrite
+COPY .dummy certs/server.* /etc/apache2/ssl/
+# myapp.conf
+COPY myapp.conf /etc/apache2/sites-available/myapp.conf
+RUN mkdir -p /var/www/html/public \
+ && a2enmod ssl \
+ && a2enmod rewrite \
+ && a2enmod expires \
+ && a2enmod headers \
+ && a2dissite 000-default.conf \
+ && a2ensite myapp.conf \
+ && service apache2 restart
+
+#######################################################
+# PHP
+#######################################################
+# Default php.ini file
+ADD https://raw.githubusercontent.com/php/php-src/php-${PHP_VERSION}/php.ini-production  /usr/local/etc/php/php.ini-production
+ADD https://raw.githubusercontent.com/php/php-src/php-${PHP_VERSION}/php.ini-development /usr/local/etc/php/php.ini-development
+RUN chmod 644 /usr/local/etc/php/php.ini-*
+# Main PHP extensions
 RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libicu-dev \
@@ -12,66 +88,25 @@ RUN set -xe \
  && docker-php-ext-install \
     bcmath \
     intl
-
 # PGSQL
 RUN apt-get update && apt-get install -y \
     libpq-dev
 RUN set -xe \
     && docker-php-ext-install \
     pdo_pgsql
-
 # Redis
 RUN pecl install -o -f redis \
  && rm -rf /tmp/pear \
  && docker-php-ext-enable redis
 
+#######################################################
+# Node, Yarn
+#######################################################
 # Node
 RUN apt-get update && apt-get install -y build-essential apt-utils gnupg gcc g++ make \
  && curl -sL https://deb.nodesource.com/setup_8.x | bash - \
  && apt-get install -y nodejs
-
 # Yarn
 RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
  && apt-get update && apt-get install yarn
-
-# UTF8
-RUN apt-get update && \
-    apt-get install -y locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8 && \
-    apt-get remove -y locales
-ENV LANG C.UTF-8
-
-# Git
-RUN apt-get update && apt-get install -y git
-
-# Zip
-RUN apt-get update && apt-get install -y zip unzip
-
-# Apache SSL
-RUN openssl genrsa 2048 > server.key \
- && openssl req -new -key server.key -subj "/C=JP/CN=localhost" > server.csr \
- && openssl x509 -in server.csr -days 3650 -req -signkey server.key > server.crt \
- && mkdir -p /etc/apache2/ssl \
- && cp server.crt /etc/apache2/ssl/server.crt \
- && cp server.key /etc/apache2/ssl/server.key \
- && chmod 400 /etc/apache2/ssl/server.key
-
-# Apache FQDN
-RUN echo "ServerName localhost" > /etc/apache2/conf-available/fqdn.conf \
- && a2enconf fqdn
-
-# Apache
-COPY myapp.conf /etc/apache2/sites-available/myapp.conf
-RUN mkdir -p /var/www/html/public \
- && a2enmod ssl \
- && a2enmod rewrite \
- && a2enmod expires \
- && a2enmod headers \
- && a2dissite 000-default.conf \
- && a2ensite myapp.conf \
- && service apache2 restart
-
-# Cron, Vim
-RUN apt-get update && apt-get install -y cron vim
