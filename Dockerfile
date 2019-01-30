@@ -53,8 +53,6 @@ RUN openssl genrsa 2048 > server.key \
  && cp server.crt /etc/apache2/ssl/server.crt \
  && cp server.key /etc/apache2/ssl/server.key \
  && chmod 400 /etc/apache2/ssl/server.key
-# Overwrite
-COPY .dummy certs/server.* /etc/apache2/ssl/
 # myapp.conf
 COPY myapp.conf /etc/apache2/sites-available/myapp.conf
 RUN mkdir -p /var/www/html/public \
