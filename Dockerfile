@@ -89,6 +89,11 @@ RUN set -xe \
 RUN pecl install -o -f redis \
  && rm -rf /tmp/pear \
  && docker-php-ext-enable redis
+# GD, Exif
+RUN apt-get update \
+ && apt-get install -y libjpeg-dev libfreetype6-dev \
+ && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-install -j$(nproc) gd exif
 
 #######################################################
 # Node, Yarn
