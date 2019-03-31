@@ -110,6 +110,7 @@ RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
  && apt-get update && apt-get install yarn
 
 # php-mongodb
-RUN pecl install -o -f mongodb \
+RUN apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev \
+ && pecl install -o -f mongodb \
  && rm -rf /tmp/pear \
  && docker-php-ext-enable mongodb
