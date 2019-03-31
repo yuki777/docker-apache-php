@@ -108,3 +108,8 @@ RUN apt-get update && apt-get install -y build-essential apt-utils gnupg gcc g++
 RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
  && apt-get update && apt-get install yarn
+
+# php-mongodb
+RUN pecl install -o -f mongodb \
+ && rm -rf /tmp/pear \
+ && docker-php-ext-enable mongodb
