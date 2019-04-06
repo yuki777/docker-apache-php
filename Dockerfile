@@ -13,8 +13,7 @@ ENV LANG C.UTF-8
 #######################################################
 # User
 #######################################################
-ARG UID=1000
-RUN useradd -m -s /bin/bash -u ${UID} docker && adduser docker sudo
+RUN useradd -ms /bin/bash docker && adduser docker sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 #######################################################
