@@ -114,3 +114,9 @@ RUN apt-get install -y libcurl4-openssl-dev pkg-config libssl-dev \
  && pecl install -o -f mongodb \
  && rm -rf /tmp/pear \
  && docker-php-ext-enable mongodb
+
+# php-memcached
+RUN apt-get install -y libmemcached-dev \
+ && yes '' | pecl install -o -f memcached \
+ && rm -rf /tmp/pear \
+ && docker-php-ext-enable memcached
