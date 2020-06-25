@@ -138,3 +138,10 @@ COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 RUN wget https://getcomposer.org/composer-stable.phar \
  && mv composer-stable.phar /usr/local/bin/composer \
  && chmod 755 /usr/local/bin/composer
+
+# imagick
+RUN apt-get update \
+ && apt-get install -y libmagickwand-dev --no-install-recommends \
+ && pecl install -o -f imagick\
+ && rm -rf /tmp/pear \
+ && docker-php-ext-enable imagick
