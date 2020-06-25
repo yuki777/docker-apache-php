@@ -129,3 +129,12 @@ RUN apt-get update && apt-get install -y wget \
  && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
  && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
  && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+# opcache
+RUN docker-php-ext-install opcache
+COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# composer
+RUN wget https://getcomposer.org/composer-stable.phar \
+ && mv composer-stable.phar /usr/local/bin/composer \
+ && chmod 755 /usr/local/bin/composer
