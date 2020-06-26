@@ -145,3 +145,6 @@ RUN apt-get update \
  && pecl install -o -f imagick\
  && rm -rf /tmp/pear \
  && docker-php-ext-enable imagick
+
+# hirak/prestissimo
+RUN composer global require hirak/prestissimo
