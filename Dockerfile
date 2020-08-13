@@ -1,4 +1,4 @@
-FROM php:7.3-apache-stretch
+FROM php:7.4-apache-buster
 
 #######################################################
 # UTF8
@@ -92,7 +92,7 @@ RUN pecl install -o -f redis \
 # GD, Exif
 RUN apt-get update \
  && apt-get install -y libjpeg-dev libfreetype6-dev \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+ && docker-php-ext-configure gd \
  && docker-php-ext-install -j$(nproc) gd exif
 # MySQL
 RUN docker-php-ext-install pdo_mysql
@@ -148,3 +148,8 @@ RUN apt-get update \
 
 # hirak/prestissimo
 RUN composer global require hirak/prestissimo
+
+# ext-zip
+RUN apt-get update && \
+    apt-get install -y libzip-dev && \
+    docker-php-ext-install zip
