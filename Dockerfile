@@ -102,7 +102,7 @@ RUN docker-php-ext-install pdo_mysql
 #######################################################
 # Node
 RUN apt-get update && apt-get install -y build-essential apt-utils gnupg gcc g++ make \
- && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+ && curl -sL https://deb.nodesource.com/setup_12.x | bash - \
  && apt-get install -y nodejs
 # Yarn
 RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
