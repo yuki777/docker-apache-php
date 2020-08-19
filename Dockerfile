@@ -153,3 +153,6 @@ RUN composer global require hirak/prestissimo
 RUN apt-get update && \
     apt-get install -y libzip-dev && \
     docker-php-ext-install zip
+
+# xdebug
+RUN pecl install xdebug
