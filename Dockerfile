@@ -156,3 +156,6 @@ RUN apt-get update && \
 
 # xdebug
 RUN pecl install xdebug
+
+# sockets
+RUN docker-php-ext-install sockets
