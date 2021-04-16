@@ -146,9 +146,6 @@ RUN apt-get update \
  && rm -rf /tmp/pear \
  && docker-php-ext-enable imagick
 
-# hirak/prestissimo
-RUN composer global require hirak/prestissimo
-
 # ext-zip
 RUN apt-get update && \
     apt-get install -y libzip-dev && \
@@ -159,3 +156,9 @@ RUN pecl install xdebug
 
 # sockets
 RUN docker-php-ext-install sockets
+
+# ext-grpc
+RUN apt-get update && \
+    apt-get -y --no-install-recommends install g++ zlib1g-dev && \
+    pecl install grpc && \
+    docker-php-ext-enable grpc
